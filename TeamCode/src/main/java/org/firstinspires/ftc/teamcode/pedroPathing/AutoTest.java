@@ -1,4 +1,6 @@
 package org.firstinspires.ftc.teamcode.pedroPathing; // make sure this aligns with class location
+import static android.os.SystemClock.sleep;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
@@ -6,16 +8,19 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+
+import com.qualcomm.robotcore.hardware.DcMotor;
 @Autonomous(name = "Auto Test", group = "Examples")
 public class AutoTest extends OpMode {
+
+    private DcMotor motor1, motor2, insert;
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
 
-    private final Pose endPose = new Pose(114.2, 42.2, Math.toRadians(0)); // Start Pose of our robot.
-    private final Pose startPose = new Pose(24, 24, Math.toRadians(0)); // Start Pose of our robot.
-    private final Pose scorePose = new Pose(84, 84, Math.toRadians(45)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    private final Pose startPose = new Pose(24, 131, Math.toRadians(135)); // Start Pose of our robot.
+    private final Pose scorePose = new Pose(36, 72, Math.toRadians(135)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
     private final Pose pickup1Pose = new Pose(106, 84, Math.toRadians(0)); // Highest (First Set) of Artifacts from the Spike Mark.
     private final Pose pickup2Pose = new Pose(106, 60, Math.toRadians(0)); // Middle (Second Set) of Artifacts from the Spike Mark.
     private final Pose pickup3Pose = new Pose(106, 36, Math.toRadians(0)); // Lowest (Third Set) of Artifacts from the Spike Mark.
@@ -72,6 +77,18 @@ public class AutoTest extends OpMode {
         switch (pathState) {
             case 0:
                 follower.followPath(scorePreload);
+                motor1.setPower(1);
+                motor2.setPower(1);
+                sleep(3500);
+                for (int i = 0; i < 3; i++) {
+                    insert.setPower(0.35);
+                    sleep(1800);
+                    insert.setPower(0);
+                    sleep(2700);
+                }
+                telemetry.addData("auto", "finished");
+                telemetry.update();
+                sleep(10000);
                 setPathState(1);
                 break;
             case 1:
@@ -173,6 +190,13 @@ public class AutoTest extends OpMode {
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 
+        motor1 = hardwareMap.get(DcMotor.class, "motor1");
+        motor2 = hardwareMap.get(DcMotor.class, "motor2");
+        insert = hardwareMap.get(DcMotor.class, "insert");
+
+        motor1.setDirection(DcMotor.Direction.REVERSE);
+        motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         follower = Constants.createFollower(hardwareMap);
         buildPaths();
