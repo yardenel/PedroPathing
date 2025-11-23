@@ -86,7 +86,7 @@ public class AutoTest extends OpMode {
                     insert.setPower(0);
                     sleep(2700);
                 }
-                telemetry.addData("auto", "finished");
+                telemetry.addData("auto", "finishedd");
                 telemetry.update();
                 sleep(10000);
                 setPathState(1);
